@@ -1,1 +1,629 @@
-PLACEHOLDER_FOR_HTML_CONTENT
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Weld Dynamix — Precision Test Log</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #ffffff;
+  --panel: #f8f9fa;
+  --border: #e1e4e8;
+  --accent: #0d6efd;
+  --accent2: #d63384;
+  --text: #212529;
+  --dim: #6c757d;
+  --ok: #198754;
+  --fail: #dc3545;
+  --header-bg: #0a2540;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', system-ui, sans-serif;
+  min-height: 100vh;
+  line-height: 1.5;
+  background-image: 
+    linear-gradient(rgba(13,110,253,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(13,110,253,0.04) 1px, transparent 1px);
+  background-size: 24px 24px;
+  position: relative;
+}
+body::before {
+  content: "WELD DYNAMIX  •  PRECISION TEST LOG";
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-18deg);
+  font-family: 'Inter', sans-serif;
+  font-size: 72px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  color: rgba(10,37,64,0.035);
+  pointer-events: none;
+  z-index: 0;
+  white-space: nowrap;
+  user-select: none;
+}
+.container, .header, .status-bar, .panel, .modal { position: relative; z-index: 1; }
+.header {
+  background: var(--header-bg);
+  color: white;
+  padding: 16px 28px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 4px solid #ff6b00;
+}
+.logo-area {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.logo-area img {
+  height: 42px;
+  background: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+.header-title {
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 20px;
+  letter-spacing: -0.3px;
+}
+.header-sub {
+  font-size: 12px;
+  opacity: 0.75;
+  font-weight: 400;
+}
+.container { max-width: 1280px; margin: 0 auto; padding: 24px; }
+.tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 20px;
+  border-bottom: 2px solid var(--border);
+}
+.tab {
+  padding: 10px 20px;
+  background: transparent;
+  border: none;
+  color: var(--dim);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  transition: all 0.15s;
+}
+.tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+.tab:hover { color: var(--text); }
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 24px;
+  margin-bottom: 20px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+.panel h2 {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--header-bg);
+  margin-bottom: 18px;
+  letter-spacing: -0.2px;
+}
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--dim);
+  letter-spacing: 0.3px;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+input, select, textarea {
+  width: 100%;
+  background: white;
+  border: 1px solid #ced4da;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 14px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  outline: none;
+  transition: border 0.15s, box-shadow 0.15s;
+}
+input:focus, select:focus, textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(13,110,253,0.15);
+}
+.step-block {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+  background: white;
+}
+.step-block h3 {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--header-bg);
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+.step-row {
+  display: grid;
+  grid-template-columns: 150px 1fr 200px;
+  gap: 12px;
+  align-items: end;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #f1f3f5;
+}
+.step-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+.img-preview {
+  max-width: 70px;
+  max-height: 46px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  display: none;
+  margin-top: 6px;
+}
+.btn {
+  background: var(--accent);
+  border: none;
+  color: white;
+  font-family: inherit;
+  font-weight: 600;
+  padding: 10px 22px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.15s;
+}
+.btn:hover { background: #0b5ed7; }
+.btn.secondary {
+  background: white;
+  border: 1px solid #ced4da;
+  color: var(--text);
+}
+.btn.secondary:hover { background: #f8f9fa; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  background: white;
+  border-radius: 6px;
+  overflow: hidden;
+}
+th {
+  text-align: left;
+  padding: 12px 10px;
+  background: #f1f3f5;
+  color: var(--header-bg);
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  border-bottom: 2px solid var(--border);
+}
+td {
+  padding: 10px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+tr:hover td { background: #f8f9fa; }
+.badge {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.badge.pass { background: #d1e7dd; color: var(--ok); }
+.badge.fail { background: #f8d7da; color: var(--fail); }
+.thumb {
+  max-width: 36px;
+  max-height: 28px;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  cursor: pointer;
+  vertical-align: middle;
+}
+.hidden { display: none; }
+.status-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--header-bg);
+  color: rgba(255,255,255,0.7);
+  padding: 8px 24px;
+  font-size: 12px;
+  display: flex;
+  justify-content: space-between;
+}
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0; top: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.85);
+  justify-content: center;
+  align-items: center;
+}
+.modal img { max-width: 90%; max-height: 90%; border-radius: 6px; }
+
+.step-desc {
+  font-size: 12px;
+  color: var(--dim);
+  margin-top: 2px;
+  line-height: 1.4;
+  font-weight: 400;
+}
+
+select option[disabled] { color: #adb5bd; }
+select:invalid { color: #adb5bd; }
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="logo-area">
+    <img src="[image content will be provided separately]" alt="Weld Dynamix">
+    <div>
+      <div class="header-title">Precision Test Log</div>
+      <div class="header-sub">Durability Database • Heat → Welding → Impact</div>
+    </div>
+  </div>
+  <div class="header-sub">v1.3 • Neon-ready</div>
+</div>
+
+<div class="container">
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('log')">Log New Test</button>
+    <button class="tab" onclick="showTab('history')">Test History</button>
+    <button class="tab" onclick="showTab('export')">Export / Import</button>
+  </div>
+
+  <div id="log" class="panel">
+    <h2>New Test Entry</h2>
+    <div class="form-grid">
+      <div><label>Who is testing</label><input id="tester" type="text"></div>
+      <div><label>Date</label><input id="date" type="date"></div>
+      <div><label>Model number</label><input id="model" type="text"></div>
+      <div><label>Serial number (test #)</label><input id="serial" type="text"></div>
+    </div>
+
+    <div class="step-block">
+      <h3>Pre-Test Baseline</h3><div class="step-desc" style="margin-bottom:10px;">Record initial face/disc flushness and electrical/range function before any testing.</div>
+      <div class="step-row">
+        <div><label>Flushness</label><select required id="flush"><option>Even</option><option>Slightly elevated/uneven</option></select></div>
+        <div><label>Note</label><input id="baselineNote" type="text" placeholder="Baseline observation"></div>
+        <div><label>Photo</label><input type="file" accept="image/*" onchange="previewImage(this, 'baselinePreview')"><img id="baselinePreview" class="img-preview"></div>
+      </div>
+      <div style="margin-top:8px"><label>Electrical / Range</label><select required id="baseline"><option value="" disabled selected style="color:#adb5bd">Pass/Fail</option><option>Pass</option><option>Fail</option></select></div>
+    </div>
+
+    <div class="step-block">
+      <h3>Heat Sequence</h3>
+      <div class="step-row">
+        <div><label>H0 Soak</label><div class="step-desc">200°F continuous soak (1.0 h); Range Test</div><select required id="h0"><option value="" disabled selected style="color:#adb5bd">Pass/Fail</option><option>Pass</option><option>Fail</option></select></div>
+        <div><label>Note</label><input id="h0Note" type="text" placeholder="H0 note"></div>
+        <div><label>Photo</label><input type="file" accept="image/*" onchange="previewImage(this, 'h0Preview')"><img id="h0Preview" class="img-preview"></div>
+      </div>
+      <div class="step-row">
+        <div><label>H1 Face Burst</label><div class="step-desc">500°F intermittent 10 s face bursts; 30 s max cool; 5 cycles; Range Test</div><select required id="h1"><option value="" disabled selected style="color:#adb5bd">Pass/Fail</option><option>Pass</option><option>Fail</option></select></div>
+        <div><label>Note</label><input id="h1Note" type="text" placeholder="H1 note"></div>
+        <div><label>Photo</label><input type="file" accept="image/*" onchange="previewImage(this, 'h1Preview')"><img id="h1Preview" class="img-preview"></div>
+      </div>
+      <div class="step-row">
+        <div><label>H2 Heat & Pry</label><div class="step-desc">300°F heat gun, 20 s × 3 cycles; observe flushness; moderate exacto pry</div><select required id="h2"><option value="" disabled selected style="color:#adb5bd">Pass/Fail</option><option>Pass</option><option>Fail</option></select></div>
+        <div><label>Note</label><input id="h2Note" type="text" placeholder="H2 note"></div>
+        <div><label>Photo</label><input type="file" accept="image/*" onchange="previewImage(this, 'h2Preview')"><img id="h2Preview" class="img-preview"></div>
+      </div>
+    </div>
+
+    <div class="step-block">
+      <h3>Welding Sequence</h3>
+      <div class="step-row">
+        <div><label>W0 Side-body</label><div class="step-desc">Body threads test (nut centered) — 10 sec @ 1"; 3 cycles, ≥1 min cooldown</div><select required id="w0"><option value="" disabled selected style="color:#adb5bd">Pass/Fail</option><option>Pass</option><option>Fail</option></select></div>
+        <div><label>Note</label><input id="w0Note" type="text" placeholder="W0 note"></div>
+        <div><label>Photo</label><input type="file" accept="image/*" onchange="previewImage(this, 'w0Preview')"><img id="w0Preview" class="img-preview"></div>
+      </div>
+      <div class="step-row">
+        <div><label>W1 Face Spatter</label><div class="step-desc">~1000°F burst, 3 cycles, non-fixtured 1" along dia.; 1 min cool between</div><select required id="w1"><option value="" disabled selected style="color:#adb5bd">Pass/Fail</option><option>Pass</option><option>Fail</option></select></div>
+        <div><label>Note</label><input id="w1Note" type="text" placeholder="W1 note"></div>
+        <div><label>Photo</label><input type="file" accept="image/*" onchange="previewImage(this, 'w1Preview')"><img id="w1Preview" class="img-preview"></div>
+      </div>
+      <div class="step-row">
+        <div><label>W2 Range Welding</label><div class="step-desc">~1000°F burst, 3 cycles, non-fixtured 1" along dia.; range observed</div><select required id="w2"><option value="" disabled selected style="color:#adb5bd">Pass/Fail</option><option>Pass</option><option>Fail</option></select></div>
+        <div><label>Note</label><input id="w2Note" type="text" placeholder="W2 note"></div>
+        <div><label>Photo</label><input type="file" accept="image/*" onchange="previewImage(this, 'w2Preview')"><img id="w2Preview" class="img-preview"></div>
+      </div>
+    </div>
+
+    <div class="step-block">
+      <h3>Impact / Shock Sequence</h3>
+      <div class="step-row">
+        <div><label>B0 Face Impact</label><div class="step-desc">Energy to face: flat (Impact Machine) 100 X — heat-soaked</div><select required id="b0"><option value="" disabled selected style="color:#adb5bd">Pass/Fail</option><option>Pass</option><option>Fail</option></select></div>
+        <div><label>Note</label><input id="b0Note" type="text" placeholder="B0 note"></div>
+        <div><label>Photo</label><input type="file" accept="image/*" onchange="previewImage(this, 'b0Preview')"><img id="b0Preview" class="img-preview"></div>
+      </div>
+      <div class="step-row">
+        <div><label>B1 Rim Impact</label><div class="step-desc">Energy to rim (Impact Machine @ 45°) 100X — soaked</div><select required id="b1"><option value="" disabled selected style="color:#adb5bd">Pass/Fail</option><option>Pass</option><option>Fail</option></select></div>
+        <div><label>Note</label><input id="b1Note" type="text" placeholder="B1 note"></div>
+        <div><label>Photo</label><input type="file" accept="image/*" onchange="previewImage(this, 'b1Preview')"><img id="b1Preview" class="img-preview"></div>
+      </div>
+      <div class="step-row">
+        <div><label>B2 Face Butality</label><div class="step-desc">Infinite strikes — Impact Machine Flat >100X, room temp, non-fixtured</div><select required id="b2"><option value="" disabled selected style="color:#adb5bd">Pass/Fail</option><option>Pass</option><option>Fail</option></select></div>
+        <div><label>Note</label><input id="b2Note" type="text" placeholder="B2 note"></div>
+        <div><label>Photo</label><input type="file" accept="image/*" onchange="previewImage(this, 'b2Preview')"><img id="b2Preview" class="img-preview"></div>
+      </div>
+    </div>
+
+    <div style="margin-top:20px; display:flex; gap:12px;">
+      <button class="btn" onclick="saveTest()">Save Test</button>
+      <button class="btn secondary" onclick="clearForm()">Clear Form</button>
+    </div>
+  </div>
+
+  <div id="history" class="panel hidden">
+    <h2>Test History</h2>
+    <div id="historyTable"></div>
+  </div>
+
+  <div id="export" class="panel hidden">
+    <h2>Data Export / Import</h2>
+    <p style="margin-bottom:16px; color:var(--dim); font-size:14px;">Export the full database as JSON or import previous logs. Images are stored as base64.</p>
+    <div style="display:flex; gap:12px; margin-bottom:16px;">
+      <button class="btn" onclick="exportDB()">Export JSON</button>
+      <button class="btn secondary" onclick="document.getElementById('importFile').click()">Import JSON</button>
+      <input type="file" id="importFile" accept=".json" style="display:none" onchange="importDB(event)">
+    </div>
+    <textarea id="jsonPreview" rows="10" readonly style="font-size:12px; font-family:'JetBrains Mono',monospace;"></textarea>
+  </div>
+</div>
+
+<div class="status-bar">
+  <span>Weld Dynamix Precision Test Log</span><span style="margin-left:auto;">v1.3</span>
+  <span id="recordCount">0 records</span>
+</div>
+
+<div id="imgModal" class="modal" onclick="this.style.display='none'">
+  <img id="modalImg" src="">
+</div>
+
+<script>
+const DB_KEY = 'wd_durability_tests_v2';
+
+function getDB() {
+  return JSON.parse(localStorage.getItem(DB_KEY) || '[]');
+}
+function setDB(data) {
+  localStorage.setItem(DB_KEY, JSON.stringify(data));
+  updateCount();
+}
+function updateCount() {
+  document.getElementById('recordCount').textContent = getDB().length + ' records';
+}
+updateCount();
+
+function showTab(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.add('hidden'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.remove('hidden');
+  event.target.classList.add('active');
+  if (id === 'history') renderHistory();
+  if (id === 'export') document.getElementById('jsonPreview').value = JSON.stringify(getDB(), null, 2);
+}
+
+function previewImage(input, previewId) {
+  const preview = document.getElementById(previewId);
+  if (input.files && input.files[0]) {
+    const reader = new FileReader();
+    reader.onload = e => {
+      preview.src = e.target.result;
+      preview.style.display = 'block';
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+
+function fileToBase64(file) {
+  return new Promise((resolve) => {
+    if (!file) return resolve(null);
+    const reader = new FileReader();
+    reader.onload = e => resolve(e.target.result);
+    reader.readAsDataURL(file);
+  });
+}
+
+async function saveTest() {
+  const steps = ['baseline', 'h0', 'h1', 'h2', 'w0', 'w1', 'w2', 'b0', 'b1', 'b2'];
+  const images = {};
+  for (const s of steps) {
+    const input = document.querySelector(`input[type=file][onchange*="${s}Preview"]`);
+    if (input && input.files[0]) {
+      images[s] = await fileToBase64(input.files[0]);
+    }
+  }
+
+  const test = {
+    id: Date.now(),
+    tester: document.getElementById('tester').value,
+    date: document.getElementById('date').value,
+    model: document.getElementById('model').value,
+    serial: document.getElementById('serial').value,
+    flush: document.getElementById('flush').value,
+    baseline: document.getElementById('baseline').value,
+    baselineNote: document.getElementById('baselineNote').value,
+    heat: {
+      h0: document.getElementById('h0').value, h0Note: document.getElementById('h0Note').value,
+      h1: document.getElementById('h1').value, h1Note: document.getElementById('h1Note').value,
+      h2: document.getElementById('h2').value, h2Note: document.getElementById('h2Note').value
+    },
+    welding: {
+      w0: document.getElementById('w0').value, w0Note: document.getElementById('w0Note').value,
+      w1: document.getElementById('w1').value, w1Note: document.getElementById('w1Note').value,
+      w2: document.getElementById('w2').value, w2Note: document.getElementById('w2Note').value
+    },
+    impact: {
+      b0: document.getElementById('b0').value, b0Note: document.getElementById('b0Note').value,
+      b1: document.getElementById('b1').value, b1Note: document.getElementById('b1Note').value,
+      b2: document.getElementById('b2').value, b2Note: document.getElementById('b2Note').value
+    },
+    images: images
+  };
+
+  const db = getDB();
+  if (window.editingId) {
+    const idx = db.findIndex(t => t.id === window.editingId);
+    if (idx !== -1) {
+      test.id = window.editingId;
+      db[idx] = test;
+    }
+    window.editingId = null;
+    document.querySelector('#log h2').textContent = 'New Test Entry';
+    alert('Test updated successfully');
+  } else {
+    db.unshift(test);
+    alert('Test saved successfully');
+  }
+  setDB(db);
+  clearForm();
+}
+
+function clearForm() {
+  document.querySelectorAll('#log input, #log select, #log textarea').forEach(el => {
+    if (el.type === 'date') el.value = '';
+    else if (el.type === 'file') el.value = '';
+    else if (el.tagName === 'SELECT') el.selectedIndex = 0;
+    else el.value = '';
+  });
+  document.querySelectorAll('.img-preview').forEach(img => { img.style.display = 'none'; img.src = ''; });
+}
+
+function thumb(imgData) {
+  if (!imgData) return '—';
+  return `<img class="thumb" src="${imgData}" onclick="showModal('${imgData}')">`;
+}
+
+function showModal(src) {
+  document.getElementById('modalImg').src = src;
+  document.getElementById('imgModal').style.display = 'flex';
+}
+
+function renderHistory() {
+  const db = getDB();
+  if (!db.length) {
+    document.getElementById('historyTable').innerHTML = '<p style="color:var(--dim)">No records in database</p>';
+    return;
+  }
+  let html = `<table><thead><tr>
+    <th>Serial</th><th>Model</th><th>Date</th><th>H0</th><th>H1</th><th>H2</th><th>W0</th><th>W1</th><th>W2</th><th>B0</th><th>B1</th><th>B2</th>
+  </tr></thead><tbody>`;
+  db.forEach(t => {
+    const badge = (v) => v === 'Pass' ? '<span class="badge pass">Pass</span>' : '<span class="badge fail">Fail</span>';
+    html += `<tr>
+      <td>${t.serial || '—'}</td>
+      <td>${t.model || '—'}</td>
+      <td>${t.date || '—'}</td>
+      <td>${badge(t.heat.h0)} ${thumb(t.images?.h0)}</td>
+      <td>${badge(t.heat.h1)} ${thumb(t.images?.h1)}</td>
+      <td>${badge(t.heat.h2)} ${thumb(t.images?.h2)}</td>
+      <td>${badge(t.welding.w0)} ${thumb(t.images?.w0)}</td>
+      <td>${badge(t.welding.w1)} ${thumb(t.images?.w1)}</td>
+      <td>${badge(t.welding.w2)} ${thumb(t.images?.w2)}</td>
+      <td>${badge(t.impact.b0)} ${thumb(t.images?.b0)}</td>
+      <td>${badge(t.impact.b1)} ${thumb(t.images?.b1)}</td>
+      <td>${badge(t.impact.b2)} ${thumb(t.images?.b2)}</td>
+    </tr>`;
+  });
+  html += '</tbody></table>';
+  document.getElementById('historyTable').innerHTML = html;
+}
+
+
+function loadForEdit(id) {
+  const db = getDB();
+  const test = db.find(t => t.id === id);
+  if (!test) return;
+  // Switch to log tab
+  showTab('log');
+  // Populate fields
+  document.getElementById('tester').value = test.tester || '';
+  document.getElementById('date').value = test.date || '';
+  document.getElementById('model').value = test.model || '';
+  document.getElementById('serial').value = test.serial || '';
+  document.getElementById('flush').value = test.flush || 'Even';
+  document.getElementById('baseline').value = test.baseline || '';
+  document.getElementById('baselineNote').value = test.baselineNote || '';
+  // Heat
+  document.getElementById('h0').value = test.heat?.h0 || '';
+  document.getElementById('h0Note').value = test.heat?.h0Note || '';
+  document.getElementById('h1').value = test.heat?.h1 || '';
+  document.getElementById('h1Note').value = test.heat?.h1Note || '';
+  document.getElementById('h2').value = test.heat?.h2 || '';
+  document.getElementById('h2Note').value = test.heat?.h2Note || '';
+  // Welding
+  document.getElementById('w0').value = test.welding?.w0 || '';
+  document.getElementById('w0Note').value = test.welding?.w0Note || '';
+  document.getElementById('w1').value = test.welding?.w1 || '';
+  document.getElementById('w1Note').value = test.welding?.w1Note || '';
+  document.getElementById('w2').value = test.welding?.w2 || '';
+  document.getElementById('w2Note').value = test.welding?.w2Note || '';
+  // Impact
+  document.getElementById('b0').value = test.impact?.b0 || '';
+  document.getElementById('b0Note').value = test.impact?.b0Note || '';
+  document.getElementById('b1').value = test.impact?.b1 || '';
+  document.getElementById('b1Note').value = test.impact?.b1Note || '';
+  document.getElementById('b2').value = test.impact?.b2 || '';
+  document.getElementById('b2Note').value = test.impact?.b2Note || '';
+  // Store editing id so save updates instead of creating new
+  window.editingId = id;
+  document.querySelector('#log h2').textContent = 'Edit Test Entry';
+  alert('Loaded for editing. Change values and click Save Test to update.');
+}
+
+// Modify saveTest to handle updates
+function exportDB() {
+  const data = JSON.stringify(getDB(), null, 2);
+  const blob = new Blob([data], {type: 'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'WD_Durability_Test_Log.json';
+  a.click();
+}
+
+function importDB(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    try {
+      const data = JSON.parse(ev.target.result);
+      if (Array.isArray(data)) {
+        setDB(data);
+        alert('Database imported — ' + data.length + ' records');
+        document.getElementById('jsonPreview').value = JSON.stringify(data, null, 2);
+      }
+    } catch (err) { alert('Invalid JSON'); }
+  };
+  reader.readAsText(file);
+}
+
+document.getElementById('date').valueAsDate = new Date();
+</script>
+</body>
+</html>
